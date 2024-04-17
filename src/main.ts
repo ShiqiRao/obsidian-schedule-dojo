@@ -1,26 +1,22 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
+import { viewTypeTimeline } from './constants';
+import TimelineView from './ui/timeline-view';
+import { DojoSettings } from './settings';
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
+//TODO: Remember to rename these classes and interfaces!
+const DEFAULT_SETTINGS: DojoSettings = {
+	timelineIcon: 'calendar-clock',
+	testText: 'Hello, World!'
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
-
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class Dojo extends Plugin {
+	settings: DojoSettings;
 
 	async onload() {
 		await this.loadSettings();
-
+		this.registerViews();
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
+		const ribbonIconEl = this.addRibbonIcon('calendar-clock', 'Go schedule!', this.initTimeLineLeaf);
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
@@ -76,10 +72,11 @@ export default class MyPlugin extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.initTimeLineSilently();
 	}
 
-	onunload() {
-
+	async onunload() {
+		this.app.workspace.detachLeavesOfType(viewTypeTimeline);
 	}
 
 	async loadSettings() {
@@ -89,7 +86,53 @@ export default class MyPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	async initTimeLineSilently() {
+		const rightLeaf = this.app.workspace.getRightLeaf(false);
+		if (rightLeaf) {
+			await rightLeaf.setViewState({
+				type: viewTypeTimeline,
+				active: false,
+			});
+		}
+		this.app.workspace.rightSplit.expand();
+	}
+
+	initTimeLineLeaf = async () =>{
+		const timelineLeaf = this.app.workspace.getLeavesOfType(viewTypeTimeline)[0];
+		if (timelineLeaf) {
+			this.app.workspace.revealLeaf(timelineLeaf);
+			return;
+		}
+
+		this.app.workspace.detachLeavesOfType(viewTypeTimeline);
+		const rightLeaf = this.app.workspace.getRightLeaf(false);
+		if (rightLeaf) {
+			await rightLeaf.setViewState({
+				type: viewTypeTimeline,
+				active: true,
+			});
+		}
+		this.app.workspace.rightSplit.expand();
+
+	}
+
+	private registerViews() {
+		this.registerView(
+			viewTypeTimeline,
+			(leaf: WorkspaceLeaf) =>
+			  new TimelineView(leaf, () => this.getSettings(), new Map())
+		  );
+	}
+
+	private getSettings() {
+		if (this.settings === undefined) {
+			this.settings = DEFAULT_SETTINGS;
+		}
+		return this.settings;
+	}
 }
+
 
 class SampleModal extends Modal {
 	constructor(app: App) {
@@ -108,9 +151,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: Dojo;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: Dojo) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -125,9 +168,9 @@ class SampleSettingTab extends PluginSettingTab {
 			.setDesc('It\'s a secret')
 			.addText(text => text
 				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				.setValue(this.plugin.settings.testText)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.testText = value;
 					await this.plugin.saveSettings();
 				}));
 	}

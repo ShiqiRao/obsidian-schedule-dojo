@@ -1,0 +1,1 @@
+export type ComponentContext = Map<string, unknown>;
