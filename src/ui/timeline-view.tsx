@@ -23,16 +23,16 @@ export default class TimelineItemView extends ItemView {
   getDisplayText(): string {
     return "Timeline View"
   }
-  // TODO: Add icon
-  // getIcon():{
-  //     return this.settings.timelineIcon;
-  // }
+
+  getIcon(): string{
+      return this.settings().timelineIcon;
+  }
   async onOpen() {
     this.root = createRoot(this.containerEl.children[1]);
     this.root.render(
       <StrictMode>
-        <TimelineView />,
-      </StrictMode>,
+        <TimelineView /> 
+      </StrictMode>
     );
   }
 
