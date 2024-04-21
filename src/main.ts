@@ -14,12 +14,8 @@ export default class Dojo extends Plugin {
 	async onload() {
 		await this.loadSettings();
 		this.registerViews();
-		const ribbonIconEl = this.addRibbonIcon('calendar-clock', 'Go schedule!', this.initTimeLineLeaf);
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.addRibbonIcon('calendar-clock', 'Go schedule!', this.initTimeLineLeaf);
+		this.addSettingTab(new SettingTab(this.app, this));
 		this.initTimeLineSilently();
 	}
 
@@ -81,24 +77,7 @@ export default class Dojo extends Plugin {
 	}
 }
 
-
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
-
-class SampleSettingTab extends PluginSettingTab {
+class SettingTab extends PluginSettingTab {
 	plugin: Dojo;
 
 	constructor(app: App, plugin: Dojo) {
