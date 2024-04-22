@@ -1,0 +1,15 @@
+.view-content {
+    --time-ruler-width: 30px;
+    --scrollbar-width: 12px;
+  
+    --shadow-color: #00000010;
+    --shadow-right: 2px 0px 2px var(--shadow-color);
+    --shadow-bottom: 0px 2px 2px var(--shadow-color);
+  
+    display: flex;
+    flex-direction: column;
+  }
+
+.workspace-leaf-content .view-content {
+    padding: 0;
+}

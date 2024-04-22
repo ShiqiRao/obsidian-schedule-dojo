@@ -2,7 +2,7 @@ import MatrixBox from "./MatrixBox";
 
 export default function TimelineView() : JSX.Element {
   return (
-    <div className="root">
+    <div className="root" data-type="timeline">
       <div className="header">
         <div className="header-today-icon"></div>
         <div className="header-matrix-icon">
