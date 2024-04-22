@@ -4,7 +4,7 @@ import { Root, createRoot } from "react-dom/client";
 import { StrictMode } from "react";
 import { viewTypeTimeline } from "src/constants";
 import { ComponentContext } from "src/types";
-import {TimelineView} from "src/component/TimelineView";
+import TimelineView from "src/component/TimelineView";
 
 export default class TimelineItemView extends ItemView {
   root: Root | null = null;
@@ -24,14 +24,14 @@ export default class TimelineItemView extends ItemView {
     return "Timeline View"
   }
 
-  getIcon(): string{
-      return this.settings().timelineIcon;
+  getIcon(): string {
+    return this.settings().timelineIcon;
   }
   async onOpen() {
     this.root = createRoot(this.containerEl.children[1]);
     this.root.render(
       <StrictMode>
-        <TimelineView /> 
+        <TimelineView />
       </StrictMode>
     );
   }
