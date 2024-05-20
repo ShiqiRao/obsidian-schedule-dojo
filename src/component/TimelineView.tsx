@@ -9,6 +9,7 @@ export default function TimelineView(): JSX.Element {
           justifyContent: 'center',
           alignItems: 'center',
           gridTemplateColumns: 'repeat(2, var(--size-4-8)) 1fr repeat(2, var(--size-4-8))',
+          padding: 'var(--size-2-1)',
         }
       }>
         <div className="clickable-icon header-today-icon" style={
@@ -36,11 +37,12 @@ export default function TimelineView(): JSX.Element {
         <div className="header-date-container" style={
           {
             display: 'grid',
-            gridTemplateColumns: 'var(--size-4-8) 1fr var(--size-4-8)',
+            gridTemplateColumns: 'var(--size-4-8) auto var(--size-4-8)',
             justifyContent: 'center',
             alignItems: 'center',
             fontSize: 'var(--size-4-4)',
             color: 'var(--text-muted)',
+            gridGap: 'var(--size-2-1)',
           }
         }>
           <div className="clickable-icon prev-date-button" style={
