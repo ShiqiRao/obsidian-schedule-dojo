@@ -1,1 +1,2 @@
-export const viewTypeTimeline = 'dojo-timeline';
+export const VIEW_TYPE_TIMELINE = 'dojo-timeline';
+export const CONTEXT_KEY_OBSIDIAN_FACADE = 'obsidianFacade';

@@ -1,7 +1,8 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
-import { viewTypeTimeline } from './constants';
+import { CONTEXT_KEY_OBSIDIAN_FACADE, VIEW_TYPE_TIMELINE } from './constants';
 import TimelineView from './ui/timeline-view';
 import { DojoSettings } from './settings';
+import { ObsidianFacade } from './service/obsidian-facade';
 
 const DEFAULT_SETTINGS: DojoSettings = {
 	timelineIcon: 'calendar-clock',
@@ -10,9 +11,12 @@ const DEFAULT_SETTINGS: DojoSettings = {
 
 export default class Dojo extends Plugin {
 	settings: DojoSettings;
+	obsidianFacade: ObsidianFacade;
 
 	async onload() {
 		await this.loadSettings();
+
+		this.obsidianFacade = new ObsidianFacade(this.app);
 		this.registerViews();
 		this.addRibbonIcon('calendar-clock', 'Go schedule!', this.initTimeLineLeaf);
 		this.addSettingTab(new SettingTab(this.app, this));
@@ -20,7 +24,7 @@ export default class Dojo extends Plugin {
 	}
 
 	async onunload() {
-		this.app.workspace.detachLeavesOfType(viewTypeTimeline);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_TIMELINE);
 	}
 
 	async loadSettings() {
@@ -35,7 +39,7 @@ export default class Dojo extends Plugin {
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
 		if (rightLeaf) {
 			await rightLeaf.setViewState({
-				type: viewTypeTimeline,
+				type: VIEW_TYPE_TIMELINE,
 				active: false,
 			});
 		}
@@ -43,17 +47,17 @@ export default class Dojo extends Plugin {
 	}
 
 	initTimeLineLeaf = async () =>{
-		const timelineLeaf = this.app.workspace.getLeavesOfType(viewTypeTimeline)[0];
+		const timelineLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_TIMELINE)[0];
 		if (timelineLeaf) {
 			this.app.workspace.revealLeaf(timelineLeaf);
 			return;
 		}
 
-		this.app.workspace.detachLeavesOfType(viewTypeTimeline);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_TIMELINE);
 		const rightLeaf = this.app.workspace.getRightLeaf(false);
 		if (rightLeaf) {
 			await rightLeaf.setViewState({
-				type: viewTypeTimeline,
+				type: VIEW_TYPE_TIMELINE,
 				active: true,
 			});
 		}
@@ -62,10 +66,12 @@ export default class Dojo extends Plugin {
 	}
 
 	private registerViews() {
+		const componentContext = new Map<string, unknown>();
+		componentContext.set(CONTEXT_KEY_OBSIDIAN_FACADE, this.obsidianFacade);
 		this.registerView(
-			viewTypeTimeline,
+			VIEW_TYPE_TIMELINE,
 			(leaf: WorkspaceLeaf) =>
-			  new TimelineView(leaf, () => this.getSettings(), new Map())
+			  new TimelineView(leaf, () => this.getSettings(), componentContext)
 		  );
 	}
 
